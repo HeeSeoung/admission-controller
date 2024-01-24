@@ -1,0 +1,55 @@
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: deployment-validation
+webhooks:
+  - name: "deployment-validation.production.svc"
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values: [ "production" ]
+    rules:
+      - operations: [ "CREATE" ]
+        apiGroups: [ "apps" ]
+        apiVersions: [ "v1" ]
+        resources: [ "deployments" ]
+        scope: "Namespaced"
+    clientConfig:
+      service:
+        namespace: production
+        name: webhook-server
+        path: "/validate"
+      caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURFVENDQWZtZ0F3SUJBZ0lVSlg3K0JnSUxaTGk2TytITklBOTVzd1VTU2trd0RRWUpLb1pJaHZjTkFRRUwKQlFBd0Z6RVZNQk1HQTFVRUF3d01ZV1J0YVhOemFXOXVYMk5oTUNBWERUSTBNREV5TXpBM01UVXlORm9ZRHpJeQpPVGN4TVRBM01EY3hOVEkwV2pBWE1SVXdFd1lEVlFRRERBeGhaRzFwYzNOcGIyNWZZMkV3Z2dFaU1BMEdDU3FHClNJYjNEUUVCQVFVQUE0SUJEd0F3Z2dFS0FvSUJBUURHU1hOdnBjMlRlQzhNNWE3S0NSdjFLQzltVkxIL1VndWYKdnZxWHZKaVAzak9uYVZaNk1KNUN6R3BPNkxMVjg2ZnJjRVNDMElWRDNNNEtTbzJQMmhRTW1mc1lZci91T3VaeApBaUxHOTBJV21xaG1FS05KV29Sa0IwcklRSDEzazlkb2VmNWxUSjFVVi9QNHpPaHhxZG13WWhoS2dxdjc5dkI2CkVacmUrODZBTjg1d095MTUrcjBXOXdYVjhCUUMya3NZYmFSZUkvV1hhbzFnRkN5Nnc1MmFTUDJwRlAycUdLdlEKVnkyWERTMVhXQ2hkTmM0R3ZyRkJ5RjVuTy9SakxrMGFrU0RRcVNaR1pkaThpN2pYeTVPU0RWanZhMWRWU2xEVQp1bnYxeGFMMkowTEpXS24rKzJsRlYwbk0zRnVsMDRIVzhXdzI2R2VpMnB0bm1nU0Vhb3BsQWdNQkFBR2pVekJSCk1CMEdBMVVkRGdRV0JCU3N3YW9ieHZtdDZPWC9jd3BxSFZ3ZG1YakltVEFmQmdOVkhTTUVHREFXZ0JTc3dhb2IKeHZtdDZPWC9jd3BxSFZ3ZG1YakltVEFQQmdOVkhSTUJBZjhFQlRBREFRSC9NQTBHQ1NxR1NJYjNEUUVCQ3dVQQpBNElCQVFBRVMrYWdua1dVV1pYZnJpVlRicTh4c3RZYUxVM3VZZUNvUEx5Z0owdVhERnpXZDU1YzBURk1RK0NICjVtZ3JFNzBPUmdLZVBTSm5MUUcwZUc4dXAyT1lzdjNOWWhvNnNtTldSWTE2b25aMUpSY1EvZ1BRbDl0U0xwcEkKWnBwcjR3Ukg1UUNZRGRrU0NXNjlvUzFkWGFJNjZxSHdkRlo5SXdUemhlNm4rVGJUVktOK29TcEI4a1Zqclo1eAo0YXBONlY3RHpoVCtBa3hXaE1NLzhuYy9lMFlubFp3MkNWS3ZWQkxXT3NJcW9oRVRyN0g4dVErM3BmbDdyODNUCnlLaU5taFQ0TE5VWWhZRVBqM1pqcTY2eG1IbEtLRXJlT241WnlZYTgzQkVrV0Y2Ri9FOW54a3FTcjc1Uis0Um4KUmxHaDZzK3I5dkxYUzQrZkZxMVQ5TmxEbUV3dQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
+    admissionReviewVersions: ["v1"]
+    sideEffects: None
+    timeoutSeconds: 5
+
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: deployment-mutation
+webhooks:
+  - name: "deployment-mutation.production.svc"
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values: [ "production" ]
+    rules:
+      - operations: [ "CREATE" ]
+        apiGroups: [ "apps" ]
+        apiVersions: [ "v1" ]
+        resources: [ "deployments" ]
+        scope: "Namespaced"
+    clientConfig:
+      service:
+        namespace: production
+        name: webhook-server
+        path: "/mutate"
+      caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURFVENDQWZtZ0F3SUJBZ0lVSlg3K0JnSUxaTGk2TytITklBOTVzd1VTU2trd0RRWUpLb1pJaHZjTkFRRUwKQlFBd0Z6RVZNQk1HQTFVRUF3d01ZV1J0YVhOemFXOXVYMk5oTUNBWERUSTBNREV5TXpBM01UVXlORm9ZRHpJeQpPVGN4TVRBM01EY3hOVEkwV2pBWE1SVXdFd1lEVlFRRERBeGhaRzFwYzNOcGIyNWZZMkV3Z2dFaU1BMEdDU3FHClNJYjNEUUVCQVFVQUE0SUJEd0F3Z2dFS0FvSUJBUURHU1hOdnBjMlRlQzhNNWE3S0NSdjFLQzltVkxIL1VndWYKdnZxWHZKaVAzak9uYVZaNk1KNUN6R3BPNkxMVjg2ZnJjRVNDMElWRDNNNEtTbzJQMmhRTW1mc1lZci91T3VaeApBaUxHOTBJV21xaG1FS05KV29Sa0IwcklRSDEzazlkb2VmNWxUSjFVVi9QNHpPaHhxZG13WWhoS2dxdjc5dkI2CkVacmUrODZBTjg1d095MTUrcjBXOXdYVjhCUUMya3NZYmFSZUkvV1hhbzFnRkN5Nnc1MmFTUDJwRlAycUdLdlEKVnkyWERTMVhXQ2hkTmM0R3ZyRkJ5RjVuTy9SakxrMGFrU0RRcVNaR1pkaThpN2pYeTVPU0RWanZhMWRWU2xEVQp1bnYxeGFMMkowTEpXS24rKzJsRlYwbk0zRnVsMDRIVzhXdzI2R2VpMnB0bm1nU0Vhb3BsQWdNQkFBR2pVekJSCk1CMEdBMVVkRGdRV0JCU3N3YW9ieHZtdDZPWC9jd3BxSFZ3ZG1YakltVEFmQmdOVkhTTUVHREFXZ0JTc3dhb2IKeHZtdDZPWC9jd3BxSFZ3ZG1YakltVEFQQmdOVkhSTUJBZjhFQlRBREFRSC9NQTBHQ1NxR1NJYjNEUUVCQ3dVQQpBNElCQVFBRVMrYWdua1dVV1pYZnJpVlRicTh4c3RZYUxVM3VZZUNvUEx5Z0owdVhERnpXZDU1YzBURk1RK0NICjVtZ3JFNzBPUmdLZVBTSm5MUUcwZUc4dXAyT1lzdjNOWWhvNnNtTldSWTE2b25aMUpSY1EvZ1BRbDl0U0xwcEkKWnBwcjR3Ukg1UUNZRGRrU0NXNjlvUzFkWGFJNjZxSHdkRlo5SXdUemhlNm4rVGJUVktOK29TcEI4a1Zqclo1eAo0YXBONlY3RHpoVCtBa3hXaE1NLzhuYy9lMFlubFp3MkNWS3ZWQkxXT3NJcW9oRVRyN0g4dVErM3BmbDdyODNUCnlLaU5taFQ0TE5VWWhZRVBqM1pqcTY2eG1IbEtLRXJlT241WnlZYTgzQkVrV0Y2Ri9FOW54a3FTcjc1Uis0Um4KUmxHaDZzK3I5dkxYUzQrZkZxMVQ5TmxEbUV3dQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
+    admissionReviewVersions: ["v1"]
+    sideEffects: None
+    timeoutSeconds: 5
