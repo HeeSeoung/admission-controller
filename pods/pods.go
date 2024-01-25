@@ -3,7 +3,7 @@ package pods
 import (
 	"encoding/json"
 
-	"github.com/douglasmakey/admissioncontroller"
+	"github.com/HeeSeoung/admission-controller"
 
 	v1 "k8s.io/api/core/v1"
 )

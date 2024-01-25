@@ -6,7 +6,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/douglasmakey/admissioncontroller"
+	"github.com/HeeSeoung/admission-controller"
 
 	"k8s.io/api/admission/v1beta1"
 	admission "k8s.io/api/admission/v1beta1"

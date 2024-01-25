@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/douglasmakey/admissioncontroller/deployments"
+	"github.com/HeeSeoung/admission-controller"
 )
 
 // NewServer creates and return a http.Server
