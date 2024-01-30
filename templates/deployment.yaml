@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: webhook-server
-          image: anhisg4104/node-labeler:v0.1
+          image: anhisg4104/node-labeler:v0.3
           imagePullPolicy: Always
           ports:
             - containerPort: 8443

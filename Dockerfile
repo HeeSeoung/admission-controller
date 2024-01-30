@@ -8,7 +8,7 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -a -ldflags '-extldflags "-static"' -o serverd cmd/main.go
 
 FROM gcr.io/distroless/base
-COPY --from=build /app/serverd /
+COPY --from=builder /app/serverd /
 EXPOSE 8443
 
 CMD ["/serverd"]

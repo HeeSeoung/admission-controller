@@ -7,7 +7,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/HeeSeoung/admission-controller"
+	"github.com/HeeSeoung/admission-controller/server"
 
 	log "k8s.io/klog/v2"
 )
@@ -22,7 +22,7 @@ func main() {
 	flag.StringVar(&port, "port", "8443", "The port on which to listen")
 	flag.Parse()
 
-	server := http.NewServer(port)
+	server := server.NewServer(port)
 
 	go func() {
 		// listen shutdown signal

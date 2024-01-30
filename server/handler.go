@@ -8,8 +8,8 @@ import (
 
 	"github.com/HeeSeoung/admission-controller"
 
-	"k8s.io/api/admission/v1beta1"
-	admission "k8s.io/api/admission/v1beta1"
+	"k8s.io/api/admission/v1"
+	admission "k8s.io/api/admission/v1"
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
@@ -49,9 +49,11 @@ func (h *admissionHandler) Serve(hook admissioncontroller.Hook) http.HandlerFunc
 		}
 
 		var review admission.AdmissionReview
-		if _, _, err := h.decoder.Decode(body, nil, &review); err != nil {
+		if _, gvk, err := h.decoder.Decode(body, nil, &review); err != nil {
 			http.Error(w, fmt.Sprintf("could not deserialize request: %v", err), http.StatusBadRequest)
 			return
+		} else {
+			review.SetGroupVersionKind(*gvk)
 		}
 
 		if review.Request == nil {
@@ -65,14 +67,16 @@ func (h *admissionHandler) Serve(hook admissioncontroller.Hook) http.HandlerFunc
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
+		log.Infof("%+v", result)
 
-		admissionResponse := v1beta1.AdmissionReview{
-			Response: &v1beta1.AdmissionResponse{
+		admissionResponse := v1.AdmissionReview{
+			Response: &v1.AdmissionResponse{
 				UID:     review.Request.UID,
 				Allowed: result.Allowed,
 				Result:  &meta.Status{Message: result.Msg},
 			},
 		}
+		log.Infof("%+v", admissionResponse)
 
 		// set the patch operations for mutating admission
 		if len(result.PatchOps) > 0 {
@@ -83,13 +87,14 @@ func (h *admissionHandler) Serve(hook admissioncontroller.Hook) http.HandlerFunc
 			}
 			admissionResponse.Response.Patch = patchBytes
 		}
-
+	
 		res, err := json.Marshal(admissionResponse)
 		if err != nil {
 			log.Error(err)
 			http.Error(w, fmt.Sprintf("could not marshal response: %v", err), http.StatusInternalServerError)
 			return
 		}
+		log.Infof("%+v", res)
 
 		log.Infof("Webhook [%s - %s] - Allowed: %t", r.URL.Path, review.Request.Operation, result.Allowed)
 		w.WriteHeader(http.StatusOK)

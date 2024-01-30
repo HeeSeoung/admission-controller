@@ -5,12 +5,12 @@ import (
 
 	"github.com/HeeSeoung/admission-controller"
 
-	"k8s.io/api/admission/v1beta1"
+	admission "k8s.io/api/admission/v1"
 	v1 "k8s.io/api/core/v1"
 )
 
 func validateCreate() admissioncontroller.AdmitFunc {
-	return func(r *v1beta1.AdmissionRequest) (*admissioncontroller.Result, error) {
+	return func(r *admission.AdmissionRequest) (*admissioncontroller.Result, error) {
 		pod, err := parsePod(r.Object.Raw)
 		if err != nil {
 			return &admissioncontroller.Result{Msg: err.Error()}, nil
@@ -27,7 +27,7 @@ func validateCreate() admissioncontroller.AdmitFunc {
 }
 
 func mutateCreate() admissioncontroller.AdmitFunc {
-	return func(r *v1beta1.AdmissionRequest) (*admissioncontroller.Result, error) {
+	return func(r *admission.AdmissionRequest) (*admissioncontroller.Result, error) {
 		var operations []admissioncontroller.PatchOperation
 		pod, err := parsePod(r.Object.Raw)
 		if err != nil {
@@ -35,7 +35,7 @@ func mutateCreate() admissioncontroller.AdmitFunc {
 		}
 
 		// Very simple logic to inject a new "sidecar" container.
-		if pod.Namespace == "special" {
+		if pod.Namespace == "production" {
 			var containers []v1.Container
 			containers = append(containers, pod.Spec.Containers...)
 			sideC := v1.Container{

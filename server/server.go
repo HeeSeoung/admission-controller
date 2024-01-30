@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/HeeSeoung/admission-controller"
+	"github.com/HeeSeoung/admission-controller/deployments"
 )
 
 // NewServer creates and return a http.Server
@@ -16,7 +16,7 @@ func NewServer(port string) *http.Server {
 	ah := newAdmissionHandler()
 	mux := http.NewServeMux()
 	mux.Handle("/healthz", healthz())
-	mux.Handle("/mutate/deployments", ah.Serve(deploymentMutation))
+	mux.Handle("/mutate", ah.Serve(deploymentMutation))
 
 	return &http.Server{
 		Addr:    fmt.Sprintf(":%s", port),

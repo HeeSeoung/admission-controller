@@ -3,13 +3,14 @@ package deployments
 import (
 	"github.com/HeeSeoung/admission-controller"
 
-	"k8s.io/api/admission/v1beta1"
+	admission "k8s.io/api/admission/v1"
 
 	v1 "k8s.io/api/core/v1"
+	log "k8s.io/klog/v2"
 )
 
 func validateCreate() admissioncontroller.AdmitFunc {
-	return func(r *v1beta1.AdmissionRequest) (*admissioncontroller.Result, error) {
+	return func(r *admission.AdmissionRequest) (*admissioncontroller.Result, error) {
 		dp, err := parseDeployment(r.Object.Raw)
 		if err != nil {
 			return &admissioncontroller.Result{Msg: err.Error()}, nil
@@ -24,13 +25,13 @@ func validateCreate() admissioncontroller.AdmitFunc {
 }
 
 func mutateCreate() admissioncontroller.AdmitFunc {
-	return func(r *v1beta1.AdmissionRequest) (*admissioncontroller.Result, error) {
+	return func(r *admission.AdmissionRequest) (*admissioncontroller.Result, error) {
 		var operations []admissioncontroller.PatchOperation
 		dp, err := parseDeployment(r.Object.Raw)
 		if err != nil {
 			return &admissioncontroller.Result{Msg: err.Error()}, nil
 		}
-
+		log.Infof("%+v", dp)
 		// Very simple logic to inject a new "sidecar" container.
 		if dp.Namespace == "production" {
 			var containers []v1.Container
@@ -41,7 +42,8 @@ func mutateCreate() admissioncontroller.AdmitFunc {
 				Command: []string{"sh", "-c", "while true; do echo 'I am a container injected by mutating webhook'; sleep 2; done"},
 			}
 			containers = append(containers, sideC)
-			operations = append(operations, admissioncontroller.ReplacePatchOperation("/spec/containers", containers))
+			log.Infof("%+v", containers)
+			operations = append(operations, admissioncontroller.ReplacePatchOperation("/spec/templates/spec/containers", containers))
 		}
 
 		// Add a simple annotation using `AddPatchOperation`

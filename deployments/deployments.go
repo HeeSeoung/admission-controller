@@ -12,7 +12,6 @@ import (
 func NewValidationHook() admissioncontroller.Hook {
 	return admissioncontroller.Hook{
 		Create: validateCreate(),
-		Delete: validateDelete(),
 	}
 }
 
