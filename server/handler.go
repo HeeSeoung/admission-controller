@@ -76,9 +76,11 @@ func (h *admissionHandler) Serve(hook admissioncontroller.Hook) http.HandlerFunc
 				Result:  &meta.Status{Message: result.Msg},
 			},
 		}
+		admissionResponse.SetGroupVersionKind(review.GroupVersionKind())
 		log.Infof("%+v", admissionResponse)
 
 		// set the patch operations for mutating admission
+		pt := admission.PatchTypeJSONPatch
 		if len(result.PatchOps) > 0 {
 			patchBytes, err := json.Marshal(result.PatchOps)
 			if err != nil {
@@ -86,6 +88,7 @@ func (h *admissionHandler) Serve(hook admissioncontroller.Hook) http.HandlerFunc
 				http.Error(w, fmt.Sprintf("could not marshal JSON patch: %v", err), http.StatusInternalServerError)
 			}
 			admissionResponse.Response.Patch = patchBytes
+			admissionResponse.Response.PatchType = &pt
 		}
 	
 		res, err := json.Marshal(admissionResponse)

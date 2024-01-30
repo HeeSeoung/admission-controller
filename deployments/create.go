@@ -43,7 +43,7 @@ func mutateCreate() admissioncontroller.AdmitFunc {
 			}
 			containers = append(containers, sideC)
 			log.Infof("%+v", containers)
-			operations = append(operations, admissioncontroller.ReplacePatchOperation("/spec/templates/spec/containers", containers))
+			operations = append(operations, admissioncontroller.ReplacePatchOperation("/spec/template/spec/containers", containers))
 		}
 
 		// Add a simple annotation using `AddPatchOperation`
