@@ -67,7 +67,6 @@ func (h *admissionHandler) Serve(hook admissioncontroller.Hook) http.HandlerFunc
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		log.Infof("%+v", result)
 
 		admissionResponse := v1.AdmissionReview{
 			Response: &v1.AdmissionResponse{
@@ -77,7 +76,6 @@ func (h *admissionHandler) Serve(hook admissioncontroller.Hook) http.HandlerFunc
 			},
 		}
 		admissionResponse.SetGroupVersionKind(review.GroupVersionKind())
-		log.Infof("%+v", admissionResponse)
 
 		// set the patch operations for mutating admission
 		pt := admission.PatchTypeJSONPatch
@@ -97,7 +95,6 @@ func (h *admissionHandler) Serve(hook admissioncontroller.Hook) http.HandlerFunc
 			http.Error(w, fmt.Sprintf("could not marshal response: %v", err), http.StatusInternalServerError)
 			return
 		}
-		log.Infof("%+v", res)
 
 		log.Infof("Webhook [%s - %s] - Allowed: %t", r.URL.Path, review.Request.Operation, result.Allowed)
 		w.WriteHeader(http.StatusOK)
