@@ -15,8 +15,15 @@ func mutateUpdate() admissioncontroller.AdmitFunc {
 		if err != nil {
 			return &admissioncontroller.Result{Msg: err.Error()}, nil
 		}
-		
+
 		log.Infof("%+v", node)
+
+		newNodeLabel := node.Labels
+		if newNodeLabel == nil {
+			newNodeLabel = make(map[string]string)
+		}
+		newNodeLabel["node-mutating"] = "true"
+		operations = append(operations, admissioncontroller.ReplacePatchOperation("/labels", newNodeLabel))
 
 		// Add a simple annotation using `AddPatchOperation`
 		metadata := map[string]string{"origin": "fromMutation"}
