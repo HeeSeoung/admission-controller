@@ -49,11 +49,9 @@ func (h *admissionHandler) Serve(hook admissioncontroller.Hook) http.HandlerFunc
 		}
 
 		var review admission.AdmissionReview
-		if _, gvk, err := h.decoder.Decode(body, nil, &review); err != nil {
+		if _, _, err := h.decoder.Decode(body, nil, &review); err != nil {
 			http.Error(w, fmt.Sprintf("could not deserialize request: %v", err), http.StatusBadRequest)
 			return
-		} else {
-			review.SetGroupVersionKind(*gvk)
 		}
 
 		if review.Request == nil {
@@ -78,9 +76,9 @@ func (h *admissionHandler) Serve(hook admissioncontroller.Hook) http.HandlerFunc
 		admissionResponse.SetGroupVersionKind(review.GroupVersionKind())
 
 		// set the patch operations for mutating admission
-		pt := admission.PatchTypeJSONPatch
 		if len(result.PatchOps) > 0 {
 			patchBytes, err := json.Marshal(result.PatchOps)
+			pt := admission.PatchTypeJSONPatch
 			if err != nil {
 				log.Error(err)
 				http.Error(w, fmt.Sprintf("could not marshal JSON patch: %v", err), http.StatusInternalServerError)
