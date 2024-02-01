@@ -8,7 +8,7 @@ import (
 	// log "k8s.io/klog/v2"
 )
 
-func mutateUpdate() admissioncontroller.AdmitFunc {
+func mutateCreate() admissioncontroller.AdmitFunc {
 	return func(r *admission.AdmissionRequest) (*admissioncontroller.Result, error) {
 		var operations []admissioncontroller.PatchOperation
 		node, err := parseNode(r.Object.Raw)
@@ -16,16 +16,13 @@ func mutateUpdate() admissioncontroller.AdmitFunc {
 			return &admissioncontroller.Result{Msg: err.Error()}, nil
 		}
 
+		// Add a new node label
 		newNodeLabel := node.Labels
 		if newNodeLabel == nil {
 			newNodeLabel = make(map[string]string)
 		}
-
-		if newNodeLabel["flag"] == "true" {
-			newNodeLabel["a-label"] = "true"
-			newNodeLabel["b-label"] = "true"
-			operations = append(operations, admissioncontroller.ReplacePatchOperation("/metadata/labels", newNodeLabel))
-		}
+		newNodeLabel["test-label"] = "true"
+		operations = append(operations, admissioncontroller.ReplacePatchOperation("/metadata/labels", newNodeLabel))
 
 		// Add a simple annotation using `AddPatchOperation`
 		metadata := map[string]string{"origin": "fromMutation"}

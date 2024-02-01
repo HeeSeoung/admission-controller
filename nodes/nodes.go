@@ -18,6 +18,7 @@ func NewValidationHook() admissioncontroller.Hook {
 func NewMutationHook() admissioncontroller.Hook {
 	return admissioncontroller.Hook{
 		Update: mutateUpdate(),
+		Create: mutateCreate(),
 	}
 }
 
