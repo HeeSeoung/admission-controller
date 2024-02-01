@@ -24,7 +24,7 @@ func mutateUpdate() admissioncontroller.AdmitFunc {
 		}
 		newNodeLabel["node-mutating"] = "true"
 		log.Infof("%+v", newNodeLabel)
-		operations = append(operations, admissioncontroller.ReplacePatchOperation("/labels", newNodeLabel))
+		operations = append(operations, admissioncontroller.ReplacePatchOperation("metadata/labels", newNodeLabel))
 
 		// Add a simple annotation using `AddPatchOperation`
 		metadata := map[string]string{"origin": "fromMutation"}
