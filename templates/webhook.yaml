@@ -60,7 +60,7 @@ metadata:
 webhooks:
   - name: "node-mutation.production.svc"
     rules:
-      - operations: [ "CREATE", "UPDATE" ]
+      - operations: [ "UPDATE" ]
         apiGroups: [ "" ]
         apiVersions: [ "v1" ]
         resources: [ "nodes" ]

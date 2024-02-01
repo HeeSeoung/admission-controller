@@ -23,6 +23,7 @@ func mutateUpdate() admissioncontroller.AdmitFunc {
 			newNodeLabel = make(map[string]string)
 		}
 		newNodeLabel["node-mutating"] = "true"
+		log.Infof("%+v", newNodeLabel)
 		operations = append(operations, admissioncontroller.ReplacePatchOperation("/labels", newNodeLabel))
 
 		// Add a simple annotation using `AddPatchOperation`
