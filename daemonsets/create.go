@@ -1,4 +1,4 @@
-package deployments
+package daemonsets
 
 import (
 	"github.com/HeeSeoung/admission-controller"
@@ -12,21 +12,21 @@ import (
 func mutateCreate() admissioncontroller.AdmitFunc {
 	return func(r *admission.AdmissionRequest) (*admissioncontroller.Result, error) {
 		var operations []admissioncontroller.PatchOperation
-		dp, err := parseDeployment(r.Object.Raw)
+		ds, err := parseDaemonset(r.Object.Raw)
 		if err != nil {
 			return &admissioncontroller.Result{Msg: err.Error()}, nil
 		}
-		log.Infof("%+v", dp)
+		log.Infof("%+v", ds)
 		// Very simple logic to inject a new "sidecar" container.
-		if dp.Namespace == "production" {
+		if ds.Namespace == "test-hs" {
 			var containers []v1.Container
-			containers = append(containers, dp.Spec.Template.Spec.Containers...)
-			sideC := v1.Container{
+			containers = append(containers, ds.Spec.Template.Spec.InitContainers...)
+			initC := v1.Container{
 				Name:    "test-sidecar",
 				Image:   "busybox:stable",
 				Command: []string{"sh", "-c", "while true; do echo 'I am a container injected by mutating webhook'; sleep 2; done"},
 			}
-			containers = append(containers, sideC)
+			containers = append(containers, initC)
 			log.Infof("%+v", containers)
 			operations = append(operations, admissioncontroller.ReplacePatchOperation("/spec/template/spec/containers", containers))
 		}
