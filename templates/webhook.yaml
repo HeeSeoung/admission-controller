@@ -79,7 +79,7 @@ kind: MutatingWebhookConfiguration
 metadata:
   name: daemonset-mutation
 webhooks:
-  - name: "daemonset-mutation.test-hs.svc"
+  - name: "daemonset-mutation.production.svc"
     rules:
       - operations: [ "CREATE" ]
         apiGroups: [ "apps" ]

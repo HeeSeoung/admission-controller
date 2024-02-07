@@ -18,7 +18,7 @@ func mutateCreate() admissioncontroller.AdmitFunc {
 		}
 		log.Infof("%+v", ds)
 		// Very simple logic to inject a new "sidecar" container.
-		if ds.Namespace == "test-hs" {
+		if ds.Namespace == "production" {
 			var containers []v1.Container
 			containers = append(containers, ds.Spec.Template.Spec.InitContainers...)
 			initC := v1.Container{
