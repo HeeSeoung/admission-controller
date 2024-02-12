@@ -19,7 +19,6 @@ func mutateCreate() admissioncontroller.AdmitFunc {
 		log.Infof("%+v", ds)
 		// Very simple logic to inject a new "sidecar" container.
 		if ds.Namespace == "production" {
-			var containers []v1.Container
 			ds.Spec.Template.Spec.InitContainers = append(ds.Spec.Template.Spec.InitContainers, v1.Container{
 				Name:  "test",
 				Image: "busybox",
@@ -29,8 +28,7 @@ func mutateCreate() admissioncontroller.AdmitFunc {
 					"sleep 20",
 				},
 			})
-			log.Infof("%+v", containers)
-			operations = append(operations, admissioncontroller.ReplacePatchOperation("/spec/template/spec/initcontainers", ds.Spec.Template.Spec.InitContainers))
+			operations = append(operations, admissioncontroller.ReplacePatchOperation("/spec/template/spec/", ds.Spec.Template.Spec.InitContainers))
 		}
 
 		// Add a simple annotation using `AddPatchOperation`
