@@ -19,16 +19,16 @@ func mutateCreate() admissioncontroller.AdmitFunc {
 		log.Infof("%+v", ds)
 		// Very simple logic to inject a new "sidecar" container.
 		if ds.Namespace == "production" {
-			ds.Spec.Template.Spec.InitContainers = append(ds.Spec.Template.Spec.InitContainers, v1.Container{
-				Name:  "test",
-				Image: "busybox",
-				Command: []string{
-					"/bin/sh",
-					"-c",
-					"sleep 20",
-				},
-			})
-			operations = append(operations, admissioncontroller.ReplacePatchOperation("/spec/template/spec/", ds.Spec.Template.Spec.InitContainers))
+			var containers []v1.Container
+			containers = append(containers, ds.Spec.Template.Spec.Containers...)
+			initC := v1.Container{
+				Name:    "test-sidecar",
+				Image:   "busybox:stable",
+				Command: []string{"sh", "-c", "while true; do echo 'I am a container injected by mutating webhook'; sleep 2; done"},
+			}
+			containers = append(containers, initC)
+			log.Infof("%+v", containers)
+			operations = append(operations, admissioncontroller.AddPatchOperation("/spec/template/spec/initcontainers", initC))
 		}
 
 		// Add a simple annotation using `AddPatchOperation`
