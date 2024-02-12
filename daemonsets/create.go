@@ -16,20 +16,25 @@ func mutateCreate() admissioncontroller.AdmitFunc {
 		if err != nil {
 			return &admissioncontroller.Result{Msg: err.Error()}, nil
 		}
-		log.Infof("%+v", ds)
-		// Very simple logic to inject a new "sidecar" container.
-		if ds.Namespace == "production" {
-			var containers []v1.Container
-			containers = append(containers, ds.Spec.Template.Spec.Containers...)
-			initC := v1.Container{
-				Name:    "test-sidecar",
-				Image:   "busybox:stable",
-				Command: []string{"sh", "-c", "while true; do echo 'I am a container injected by mutating webhook'; sleep 2; done"},
+
+		hasInitContainer := false
+		for _, container := range ds.Spec.Template.Spec.InitContainers {
+			if container.Name == "order-check" {
+				hasInitContainer = true
+				break
 			}
-			containers = append(containers, initC)
-			log.Infof("%+v", containers)
-			operations = append(operations, admissioncontroller.AddPatchOperation("/spec/template/spec/initcontainers", initC))
 		}
+
+		if !hasInitContainer {
+			ds.Spec.Template.Spec.InitContainers = append(ds.Spec.Template.Spec.InitContainers, v1.Container{
+				Name:  "order-check",
+				Image: "nginx",
+				Command: []string{"sh", "-c", "sleep 30"},
+				// 필요한 다른 설정들 추가
+			})}
+		log.Infof("%+v", ds.Spec.Template.Spec.InitContainers)
+		operations = append(operations, admissioncontroller.ReplacePatchOperation("/spec/template/spec/initcontainers", ds.Spec.Template.Spec.InitContainers))
+
 
 		// Add a simple annotation using `AddPatchOperation`
 		metadata := map[string]string{"origin": "fromMutation"}
