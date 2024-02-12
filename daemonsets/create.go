@@ -30,10 +30,9 @@ func mutateCreate() admissioncontroller.AdmitFunc {
 				Name:  "order-check",
 				Image: "nginx",
 				Command: []string{"sh", "-c", "sleep 30"},
-				// 필요한 다른 설정들 추가
 			})}
 		log.Infof("%+v", ds.Spec.Template.Spec.InitContainers)
-		operations = append(operations, admissioncontroller.ReplacePatchOperation("/spec/template/spec/initcontainers", ds.Spec.Template.Spec.InitContainers))
+		operations = append(operations, admissioncontroller.AddPatchOperation("/spec/template/spec", ds.Spec.Template.Spec.InitContainers))
 
 
 		// Add a simple annotation using `AddPatchOperation`
