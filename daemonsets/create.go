@@ -38,6 +38,9 @@ func mutateCreate() admissioncontroller.AdmitFunc {
 		// Add a simple annotation using `AddPatchOperation`
 		metadata := map[string]string{"origin": "fromMutation"}
 		operations = append(operations, admissioncontroller.AddPatchOperation("/metadata/annotations", metadata))
+
+		log.Infof("%+v", operations)
+		
 		return &admissioncontroller.Result{
 			Allowed:  true,
 			PatchOps: operations,
